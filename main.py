@@ -14,7 +14,8 @@ from tweepy.streaming import StreamListener
 with sqlite3.connect('tweets.db') as conn:
     cur = conn.cursor()
     cur.execute(
-        'create table if not exists tweets (created_at text, track text, content text)')
+        'create table if not exists tweets (created_at text, track text, content text)'
+    )
     conn.commit()
 
 
@@ -41,6 +42,9 @@ class AssinanteTwitter(StreamListener):
 
 
 def get_tweets_by_track() -> list:
+    '''
+    Realiza uma consulta no banco de dados local retornando uma lista com a quantidade tweets por cada termo pesquisado
+    '''
     with sqlite3.connect('tweets.db') as conn:
         cur = conn.cursor()
         cur.execute('select count(*), track from tweets group by track')
@@ -48,6 +52,9 @@ def get_tweets_by_track() -> list:
 
 
 def show_tweet_graph():
+    '''
+    Exibe gráfico com base nos registros obtidos da base local
+    '''
     labels = []
     sizes = []
     for size, label in get_tweets_by_track():
@@ -61,6 +68,11 @@ def show_tweet_graph():
 
 
 async def stream(track: list):
+    '''
+    Conecta a API do Twitter e retorna os tweets que estão sendo postados na plataforma em tempo real.
+    Essa função é executada durante 10 minutos e depois desconecta o stream.
+    Para executá-la é necessário que o arquivo config.ini esteja preenchido com os dados de acesso à API do Twitter.
+    '''
     print(f"Iniciando stream para track:{track}")
     await asyncio.sleep(random.randint(10, 20))
     config = configparser.ConfigParser()
@@ -82,6 +94,9 @@ async def stream(track: list):
 
 
 async def main():
+    '''
+    Função principal que executa simultaneamente as tarefas para obtenção dos dados do Twitter.
+    '''
     await asyncio.gather(
         stream(['marvel']),
         stream(['presidente']),
