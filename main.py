@@ -3,11 +3,13 @@ from __future__ import absolute_import, print_function
 import asyncio
 import configparser
 import json
+import random
 import sqlite3
+import sys
 
+import matplotlib.pyplot as plt
 from tweepy import OAuthHandler, Stream
 from tweepy.streaming import StreamListener
-
 
 with sqlite3.connect('tweets.db') as conn:
     cur = conn.cursor()
@@ -35,11 +37,32 @@ class AssinanteTwitter(StreamListener):
         return True
 
     def on_error(self, status):
-        print(status)
+        print(self.name, status)
+
+
+def get_tweets_by_track() -> list:
+    with sqlite3.connect('tweets.db') as conn:
+        cur = conn.cursor()
+        cur.execute('select count(*), track from tweets group by track')
+        return cur.fetchall()
+
+
+def show_tweet_graph():
+    labels = []
+    sizes = []
+    for size, label in get_tweets_by_track():
+        labels.append(label)
+        sizes.append(size)
+
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, shadow=True, autopct='%1.1f%%')
+    ax.axis('equal')
+    plt.show()
 
 
 async def stream(track: list):
     print(f"Iniciando stream para track:{track}")
+    await asyncio.sleep(random.randint(10, 20))
     config = configparser.ConfigParser()
     config.read('config.ini')
     if not 'auth' in config.sections():
@@ -52,9 +75,9 @@ async def stream(track: list):
     assinante = AssinanteTwitter(track)
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
-    stream = Stream(auth, assinante)
+    stream = Stream(auth=auth, listener=assinante, tweet_mode='extended')
     stream.filter(track=track, is_async=True, languages=["pt"])
-    await asyncio.sleep(10)
+    await asyncio.sleep(600)  # Executará durante 10 minutos
     stream.disconnect()
 
 
@@ -65,7 +88,12 @@ async def main():
         stream(['música']),
         stream(['futebol']),
         stream(['religião']),
-        stream(['tecnologia'])
+        stream(['celular']),
+        stream(['gato']),
+        stream(['cachorro']),
     )
 
-asyncio.run(main())
+if 'graph' in sys.argv:
+    show_tweet_graph()
+else:
+    asyncio.run(main())
