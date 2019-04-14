@@ -35,12 +35,18 @@ async def stream(track: list):
     auth.set_access_token(access_token, access_token_secret)
     stream = Stream(auth, assinante)
     stream.filter(track=track, is_async=True, languages=["pt"])
+    await asyncio.sleep(10)
+    stream.disconnect()
 
 
 async def main():
     await asyncio.gather(
         stream(['marvel']),
-        stream(['presidente'])
+        stream(['presidente']),
+        stream(['música']),
+        stream(['futebol']),
+        stream(['religião']),
+        stream(['tecnologia'])
     )
 
 asyncio.run(main())
