@@ -7,10 +7,11 @@ verify_ssl = true
 pylint = "*"
 autopep8 = "*"
 pylama = "*"
+mypy = "*"
 
 [packages]
 tweepy = "*"
 matplotlib = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

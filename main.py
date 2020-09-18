@@ -98,14 +98,12 @@ async def main():
     Função principal que executa simultaneamente as tarefas para obtenção dos dados do Twitter.
     '''
     await asyncio.gather(
-        stream(['marvel']),
-        stream(['presidente']),
-        stream(['música']),
-        stream(['futebol']),
-        stream(['religião']),
-        stream(['celular']),
-        stream(['gato']),
-        stream(['cachorro']),
+        stream(['nfl']),
+        stream(['governo']),
+        stream(['covid']),
+        stream(['dólar']),
+        stream(['apple']),
+        stream(['economia']),
     )
 
 if 'graph' in sys.argv:
