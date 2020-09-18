@@ -16,6 +16,7 @@ with sqlite3.connect('tweets.db') as conn:
     cur.execute(
         'create table if not exists tweets (created_at text, track text, content text)'
     )
+    cur.execute("PRAGMA read_uncommitted = true;")
     conn.commit()
 
 
